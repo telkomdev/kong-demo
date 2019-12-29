@@ -24,7 +24,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const products = {
+let products = {
     '001': {
         'id': '001',
         'name': 'Nokia 10',
@@ -46,11 +46,30 @@ app.get('/', (req, res, next) => {
 	res.json({"hello": "helloooo"});
 });
 
-app.get('/api/products', auth, (req, res, next) => {
+app.get('/products', auth, (req, res, next) => {
 	res.json(products);
 });
 
-app.get('/api/products/:id', auth, (req, res, next) => {
+app.post('/products', auth, (req, res, next) => {
+  const body = req.body;
+  const id = body.id;
+  const name = body.name;
+  const quantity = body.quantity;
+
+  if (id == '' || name == '' || quantity == '') {
+    return res.json({'message': 'data cannot be empty'});
+  }
+
+  products[id] = {
+    'id': id,
+    'name': name,
+    'quantity': quantity
+  }
+
+	res.status(201).json({'message': 'product created', 'data': body});
+});
+
+app.get('/products/:id', auth, (req, res, next) => {
 	res.json(products[req.params.id]);
 });
 

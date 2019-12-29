@@ -25,7 +25,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const employees = {
+let employees = {
     '001': {
         'id': '001',
         'name': 'John',
@@ -47,11 +47,30 @@ app.get('/', (req, res, next) => {
 	res.json({"hello": "helloooo"});
 });
 
-app.get('/api/employees', auth, (req, res, next) => {
+app.get('/employees', auth, (req, res, next) => {
 	res.json(employees);
 });
 
-app.get('/api/employees/:id', auth, (req, res, next) => {
+app.post('/employees', auth, (req, res, next) => {
+  const body = req.body;
+  const id = body.id;
+  const name = body.name;
+  const salary = body.salary;
+
+  if (id == '' || name == '' || salary == '') {
+    return res.json({'message': 'data cannot be empty'});
+  }
+
+  employees[id] = {
+    'id': id,
+    'name': name,
+    'salary': salary
+  }
+
+	res.status(201).json({'message': 'employee created', 'data': body});
+});
+
+app.get('/employees/:id', auth, (req, res, next) => {
 	res.json(employees[req.params.id]);
 });
 
